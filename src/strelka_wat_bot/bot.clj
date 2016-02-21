@@ -49,15 +49,21 @@
                                      " (" confidence ")"
                                      " with datetime: " datetime)))
 
-    (api/send-message chat-id (str "Can't understand you " (emoji :rolled-eyes)))))
+    (api/send-message chat-id (str "Can't understand you, sorry " (emoji :grimacing)))))
 
 (defn handler [update]
   (log/debug "Got update from bot:\n"
              (json/generate-string update {:pretty true}))
 
   (when-let [message (:message update)]
-    (if (.startsWith (:text message) "/")
-      (handle-command message)
-      (handle-message message))))
+    (if-let [text (:text message)]
+      (if (.startsWith text "/")
+        (handle-command message)
+        (handle-message message))
+      
+      (api/send-message (-> update :message :chat :id)
+                        (str "I can only work with just text yet. "
+                             "I am sorry " (emoji :grimacing) ". "
+                             "But don't worry, I think I will learn soon.")))))
 
 
