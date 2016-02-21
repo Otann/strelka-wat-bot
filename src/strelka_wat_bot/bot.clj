@@ -1,12 +1,52 @@
 (ns strelka-wat-bot.bot
-  (:require [telegram.api :as api]
+  (:require [clojure.string :as s]
+            [telegram.api :as api]
             [cheshire.core :as json]
             [taoensso.timbre :as log]))
 
-(defn sample-handler [update]
+(def emoji {:bird        "\uD83D\uDC26"
+            :rolled-eyes "\uD83D\uDE44"
+            :thumbs-up   "\uD83D\uDC4D"
+            :thinking    "\uD83E\uDD14"
+            :grimacing   "\uD83D\uDE2C"
+            :confused    "\uD83D\uDE15"
+            :beer        "\uD83C\uDF7A"
+            :wine        "\uD83C\uDF77"
+            :martini     "\uD83C\uDF78"
+            :coffee      "☕️"})
+
+(def messages
+  {:welcome (str "Hi! " (emoji :rolled-eyes) "\n"
+                 "I can help you to know what events are planned on Strelka "
+                 "at certain days. Just ask me thing like "
+                 "“What's happening today?” or “What is planned for tomorrow?”")
+
+   :help (str "Just ask me thing like "
+              "“What's happening today?” or “What is planned for tomorrow?”")
+
+
+   :unknown-command (str (emoji :rolled-eyes) " I don't know this command yet")})
+
+(defn handle-command [{{chat-id :id} :chat text :text}]
+  (let [parts (s/split text #"\s")
+        command (peek parts)
+        args (pop parts)]
+    (case command
+      "/start" (api/send-message chat-id (messages :welcome))
+      "/help"  (api/send-message chat-id (messages :help))
+
+      (api/send-message chat-id (messages :unknown-command)))))
+
+(defn handle-message [{{chat-id :id} :chat}]
+  (api/send-message chat-id (emoji :bird)))
+
+(defn handler [update]
   (log/debug "Got update from bot:\n"
              (json/generate-string update {:pretty true}))
-  (let [chat (-> update :message :chat)
-        text (-> update :message :text)]
-    (api/send-message (:id chat) "\uD83D\uDC26")))
+
+  (when-let [message (:message update)]
+    (if (.startsWith (:text message) "/")
+      (handle-command message)
+      (handle-message message))))
+
 

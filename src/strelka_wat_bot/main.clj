@@ -30,7 +30,7 @@
   (telegram/init! {:token (cfg/get :telegram-token)
                    ;:handlers [bot/sample-handler]
                    :polling true})
-  (th/add-handler! bot/sample-handler))
+  (th/add-handler! bot/handler))
 
 (defn ring-init []
   (let [local-config "dev-config.edn"]
