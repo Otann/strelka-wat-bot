@@ -7,7 +7,6 @@
             [ring.adapter.jetty :refer [run-jetty]]
 
             [telegram.core :as telegram]
-            [telegram.handlers :as th]
             [strelka-wat-bot.handler :refer [app]]
             [strelka-wat-bot.bot :as bot]))
 
@@ -32,9 +31,8 @@
 (defn init []
   (cfg/verify :quit-on-error true)
   (telegram/init! {:token (cfg/get :telegram-token)
-                   ;:handlers [bot/sample-handler]
-                   :polling true})
-  (th/add-handler! bot/handler))
+                   :handlers [bot/handler]
+                   :polling true}))
 
 (defn ring-init []
   (let [local-config "dev-config.edn"]

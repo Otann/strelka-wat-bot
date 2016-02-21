@@ -13,4 +13,7 @@
 (defn handle [update]
   (if (empty? @handlers)
     (log/warn "There were no handlers to process update from Telegram")
-    (doseq [handler @handlers] (handler update))))
+    (doseq [handler @handlers]
+      (try
+        (handler update)
+        (catch Exception e (log/error "Got exception in one of handlers:\n" e))))))

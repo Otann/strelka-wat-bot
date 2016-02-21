@@ -29,4 +29,9 @@
          :init strelka-wat-bot.main/ring-init}
 
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                                  [ring/ring-mock "0.3.0"]]}})
+                                  [ring/ring-mock "0.3.0"]]}
+
+             :uberjar {:aot :all
+                       :omit-source true
+                       :main strelka-wat-bot.main
+                       :uberjar-name "strelka-wat-bot.jar"}})
