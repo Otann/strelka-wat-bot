@@ -23,7 +23,11 @@
              :telegram-token {:description "Token to connect to Telegram API"
                               :type :string
                               :required true
-                              :secret true}})
+                              :secret true}
+             :wit-token {:description "Token for Wit.ai service"
+                         :type :string
+                         :required true
+                         :secret true}})
 
 (defn init []
   (cfg/verify :quit-on-error true)

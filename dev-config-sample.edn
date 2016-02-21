@@ -1,4 +1,5 @@
 {:dev true
  :port 3000
  :hostname "http://localhost:3000"
- :telegram-token "PLACE YOUR TOKEN HERE"}
+ :telegram-token "PLACE YOUR TOKEN HERE"
+ :wit-token "PLACE YOUR TOKEN HERE"}

@@ -2,7 +2,9 @@
   (:require [clojure.string :as s]
             [telegram.api :as api]
             [cheshire.core :as json]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+
+            [strelka-wat-bot.wit-ai :as wit]))
 
 (def emoji {:bird        "\uD83D\uDC26"
             :rolled-eyes "\uD83D\uDE44"
@@ -37,8 +39,17 @@
 
       (api/send-message chat-id (messages :unknown-command)))))
 
-(defn handle-message [{{chat-id :id} :chat}]
-  (api/send-message chat-id (emoji :bird)))
+(defn handle-message [{{chat-id :id} :chat text :text}]
+  (if-let [outcome (-> (wit/parse text) (peek))]
+    (let [intent (:intent outcome)
+          confidence (:confidence outcome)
+          datetime (-> outcome :entities :datetime (peek) :value)]
+      (api/send-message chat-id (str (emoji :bird)
+                                     " Recognized intent - " intent
+                                     " (" confidence ")"
+                                     " with datetime: " datetime)))
+
+    (api/send-message chat-id (str "Can't understand you " (emoji :rolled-eyes)))))
 
 (defn handler [update]
   (log/debug "Got update from bot:\n"
