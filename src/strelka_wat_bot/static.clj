@@ -19,10 +19,11 @@
        [:div.ui.vertical.masthead.center.aligned.segment
         {:style "padding-top: 100px"}
         [:div.ui.test.container
+         [:img {:src "/img/1024.png" :style "height: 256px; width: 256px;"}]
          [:h1.header {:style {:margin-top "2em"
                               :font-size "3em"}}
           "Welcome to Strelka Wat Bot"]
          [:h3 "Telegram bot that knows what's happening in Strelka Institute"]
-         [:a.ui.huge.primary.button {:href "https://telegram.me/StrelkaWatBot"}
+         [:a.ui.huge.button {:href "https://telegram.me/StrelkaWatBot"}
           "Start Conversation"
           [:i.icon.right.arrow]]]]]]]))
