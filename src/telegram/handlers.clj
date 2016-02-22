@@ -16,4 +16,5 @@
     (doseq [handler @handlers]
       (try
         (handler update)
-        (catch Exception e (log/error "Got exception in one of handlers:\n" e))))))
+        (catch Exception e
+          (log/error e "Got erro in on of the handlers:"))))))
