@@ -2,4 +2,7 @@
  :port 3000
  :hostname "http://localhost:3000"
  :telegram-token "PLACE YOUR TOKEN HERE"
- :wit-token "PLACE YOUR TOKEN HERE"}
+ :wit-token "PLACE YOUR TOKEN HERE"
+ :timepad-org-id 12345             ; optional, default is Strelka's id
+ :org-timezone "Europe/Moscow"     ; optional, default is Europe/Moscow
+ }
