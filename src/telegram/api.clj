@@ -1,6 +1,7 @@
 (ns telegram.api
   (:require [taoensso.timbre :as log]
-            [clj-http.client :as http]))
+            [clj-http.client :as http])
+  (:import [java.io File]))
 
 (def base-url "https://api.telegram.org/bot")
 
@@ -26,10 +27,10 @@
 
 (defn send-message
   "Sends message to user"
-  [chat-id text]
-  (log/debug "Sending message" text "to" chat-id)
-  (let [url (str base-url @token "/sendMessage")
-        query {:chat_id chat-id
-               :text text}
-        resp (http/get url {:as :json :query-params query})]
-    (log/debug "Got response from server" (:body resp))))
+  ([chat-id text] (send-message chat-id {} text))
+  ([chat-id options text]
+   (log/debug "Sending message" text "to" chat-id)
+   (let [url (str base-url @token "/sendMessage")
+         query (into {:chat_id chat-id :text text} options)
+         resp (http/get url {:as :json :query-params query})]
+     (log/debug "Got response from server" (:body resp)))))

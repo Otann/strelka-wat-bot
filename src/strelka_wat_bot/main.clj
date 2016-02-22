@@ -26,7 +26,10 @@
              :wit-token {:description "Token for Wit.ai service"
                          :type :string
                          :required true
-                         :secret true}})
+                         :secret true}
+             :timepad-org-id {:description "Id of organization on TimePad service"
+                              :type :number
+                              :default 2381}})
 
 (defn init []
   (cfg/verify :quit-on-error true)
