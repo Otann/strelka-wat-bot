@@ -29,7 +29,10 @@
                          :secret true}
              :timepad-org-id {:description "Id of organization on TimePad service"
                               :type :number
-                              :default 2381}})
+                              :default 2381}
+             :org-timezone {:description "Timezone of that organization"
+                            :type :string
+                            :default "Europe/Moscow"}})
 
 (defn init []
   (cfg/verify :quit-on-error true)
