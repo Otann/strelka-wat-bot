@@ -24,6 +24,11 @@
                               :font-size "3em"}}
           "Welcome to Strelka Wat Bot"]
          [:h3 "Telegram bot that knows what's happening in Strelka Institute"]
+         [:a.ui.huge.basic.button {:href "https://github.com/otann/strelka-wat-bot"}
+          "View Source"
+          [:i.icon.right.github]]
          [:a.ui.huge.button {:href "https://telegram.me/StrelkaWatBot"}
           "Start Conversation"
-          [:i.icon.right.arrow]]]]]]]))
+          [:i.icon.right.arrow]]
+         [:p {:style "padding-top: 80px;"} "Created by "
+          [:a {:href "https://github.com/otann"} "Anton Chebotaev" ]]]]]]]))
