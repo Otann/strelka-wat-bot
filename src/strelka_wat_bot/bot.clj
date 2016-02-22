@@ -7,8 +7,7 @@
             [taoensso.timbre :as log]
 
             [strelka-wat-bot.wit-ai :as wit]
-            [strelka-wat-bot.timepad :as timepad]
-            [omniconf.core :as cfg]))
+            [strelka-wat-bot.timepad :as timepad]))
 
 (def emoji {:bird        "\uD83D\uDC26"
             :rolled-eyes "\uD83D\uDE44"
@@ -20,6 +19,9 @@
             :wine        "\uD83C\uDF77"
             :martini     "\uD83C\uDF78"
             :coffee      "☕️"})
+
+(defn date->str [date] (f/unparse (f/formatter "MMMM d" (t/time-zone-for-id "Europe/Moscow"))
+                                  date))
 
 (def messages
   {:welcome (str "Hi! " (emoji :rolled-eyes) "\n"
@@ -34,24 +36,39 @@
 
 (defn handle-command [{{chat-id :id} :chat text :text}]
   (let [parts (s/split text #"\s")
-        command (peek parts)
-        args (pop parts)]
+        command (peek parts)]
     (case command
       "/start" (api/send-message chat-id (messages :welcome))
       "/help"  (api/send-message chat-id (messages :help))
 
       (api/send-message chat-id (messages :unknown-command)))))
 
-(defn describe-events [chat-id events]
+(defn event->str [event]
+  (str "*" (:name event) "*\n"
+       (:description_short event) "\n"
+       (:url event)))
+
+(defn describe-events [chat-id requested-date events]
   (if (not-empty events)
     (let [event (peek events)
-          photo-url (-> event :poster_image :default_url)
-          photo-full (subs photo-url 0 (- (count photo-url) 18))]
-      (api/send-message chat-id "Looks like this is will happen next:")
-      (api/send-message chat-id {:parse_mode "Markdown"} (str "*" (:name event) "*"))
-      (api/send-message chat-id (:description_short event))
-      (api/send-message chat-id (:url event))
-      #_(api/send-photo   chat-id photo-full))
+          event-date (-> event :starts_at (f/parse))
+          matches-date (t/within? (t/interval requested-date (t/plus requested-date (t/days 1)))
+                                  event-date)]
+      (log/debug "Well,"
+                 "\n event-date:" event-date
+                 "\n requested-date:" requested-date
+                 "\n matches:" matches-date)
+      (if matches-date
+        (api/send-message chat-id {:parse_mode "Markdown"}
+                          (str "Looks like this is will happen on "
+                               (date->str event-date) ":\n"
+                               (event->str event)))
+        (api/send-message chat-id {:parse_mode "Markdown"}
+                          (str "Sorry " (emoji :grimacing) ", nothing happens on Strelka on "
+                               (date->str requested-date) ".\n"
+                               "But here is event that will happen next, on "
+                               (date->str event-date) ":\n"
+                               (event->str event)))))
 
     (api/send-message chat-id (str (emoji :confused)
                                    " Sorry, I cant find anything on Timepad"
@@ -62,11 +79,12 @@
                        (peek))]
     (let [intent (:intent outcome)
           confidence (:confidence outcome)
-          intent-datetime (-> outcome :entities :datetime (peek) :value)
-          datetime (or (f/parse intent-datetime) (t/now))
-          events (timepad/events datetime)]
+          intent-datetime (-> outcome :entities :datetime (peek) :value (f/parse) (t/plus (t/hours 1))) ; Wit.ai have +4 timezone for Moscow =/
+          request-datetime (t/to-time-zone (or intent-datetime (t/today-at 00 00))
+                                           (t/time-zone-for-id "Europe/Moscow"))
+          events (timepad/events request-datetime)]
       (log/debug (str "Recognized intent - " intent " (" confidence ") with datetime: " intent-datetime))
-      (describe-events chat-id events))
+      (describe-events chat-id request-datetime events))
 
     (api/send-message chat-id (str "Can't understand you, sorry " (emoji :grimacing)))))
 
@@ -79,7 +97,7 @@
       (if (.startsWith text "/")
         (handle-command message)
         (handle-message message))
-      
+
       (api/send-message (-> update :message :chat :id)
                         (str "I can only work with just text yet. "
                              "I am sorry " (emoji :grimacing) ". "
