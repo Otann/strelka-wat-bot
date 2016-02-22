@@ -58,13 +58,13 @@
                                     event-date)]
         (if matches-date
           (api/send-message chat-id {:parse_mode "Markdown"}
-                            (str "Looks like this is will happen on "
+                            (str "Looks like this will happen on "
                                  (date->str event-date) ":\n"
                                  (event->str event)))
           (api/send-message chat-id {:parse_mode "Markdown"}
-                            (str "Sorry " (emoji :grimacing) ", nothing happens on Strelka on "
+                            (str "Sorry " (emoji :grimacing) ", nothing is happening on Strelka on "
                                  (date->str local-date) ".\n"
-                                 "But here is event that will happen next, on "
+                                 "But here is an event that will happen next, on "
                                  (date->str event-date) ":\n"
                                  (event->str event)))))
 
