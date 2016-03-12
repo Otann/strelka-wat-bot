@@ -1,4 +1,4 @@
 FROM java:8
-COPY ./target/betbot.jar /usr/app/
+COPY ./target/strelka-wat-bot.jar /usr/app/
 EXPOSE  8080
-ENTRYPOINT ["java", "-jar", "/usr/app/betbot.jar"]
+ENTRYPOINT ["java", "-jar", "/usr/app/strelka-wat-bot.jar"]
