@@ -17,4 +17,4 @@
       (try
         (handler update)
         (catch Exception e
-          (log/error e "Got erro in on of the handlers:"))))))
+          (log/error e "Got error in one of the handlers:"))))))

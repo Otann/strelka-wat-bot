@@ -79,8 +79,11 @@
                        (peek))]
     (let [intent (:intent outcome)
           confidence (:confidence outcome)
-          intent-datetime (-> outcome :entities :datetime (peek) :value (f/parse) (t/plus (t/hours 1))) ; Wit.ai have +4 timezone for Moscow =/
-          request-datetime (or intent-datetime (t/today-at 00 00))]
+          intent-datetime (-> outcome :entities :datetime (peek) :value)
+          request-datetime (if intent-datetime
+                               ;FIXME: Dirty hack, Wit.ai have +4 timezone for Moscow =/
+                               (-> intent-datetime (f/parse) (t/plus (t/hours 1)))
+                               (t/today-at 00 00))]
       (log/debug (str "Recognized intent - " intent " (" confidence ") with datetime: " intent-datetime))
       (handle-date chat-id request-datetime))
 
